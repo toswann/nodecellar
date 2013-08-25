@@ -4,19 +4,43 @@ var Server = mongo.Server,
     Db = mongo.Db,
     BSON = mongo.BSONPure;
 
-//var server = new Server('localhost', 27017, {auto_reconnect: true});
-var server = new Server('paulo.mongohq.com', 10084, {auto_reconnect: true});
-db = new Db('app17728010', server, {safe: true});
+
+/*
+var xhost 		= 'localhost';
+var xport 		= 27017;
+var xdbname 	= 'test';
+var xlogin 		= 'swann';
+var xpassword 	= 'swann';
+*/
+
+// mongodb://heroku:heroku@paulo.mongohq.com:10084/app17728010
+var xhost 		= 'paulo.mongohq.com';
+var xport 		= 10084;
+var xdbname 	= 'app17728010';
+var xlogin 		= 'heroku';
+var xpassword 	= 'heroku';
+
+var server = new Server(xhost, xport, {auto_reconnect: true});
+
+db = new Db(xdbname, server, {safe: true});
 
 db.open(function(err, db) {
-    if(!err) {
-        console.log("Connected to 'winedb' database");
-        db.collection('wines', {safe:true}, function(err, collection) {
-            if (err) {
-                console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
-                populateDB();
-            }
-        });
+    if(db) {
+    	db.authenticate(xlogin, xpassword, function(err2, data2) {
+             if (data2) {
+		        console.log("Connected to 'winedb' database");
+		        db.collection('wines', { safe:true }, function(err, collection) {
+		            if (err) {
+		                console.log("The 'wines' collection doesn't exist. Creating it with sample data...");
+		                populateDB();
+		            }
+		        });
+             }
+             else{
+             	 console.log("Authentication Fail!")
+                 console.log(err2);
+             }
+         });
     }
     else {
 	    console.log("db.open ERROR");
@@ -48,6 +72,7 @@ exports.addWine = function(req, res) {
         collection.insert(wine, {safe:true}, function(err, result) {
             if (err) {
                 res.send({'error':'An error has occurred'});
+                console.log("POST Error");
             } else {
                 console.log('Success: ' + JSON.stringify(result[0]));
                 res.send(result[0]);
