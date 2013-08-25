@@ -5,8 +5,8 @@ var Server = mongo.Server,
     BSON = mongo.BSONPure;
 
 //var server = new Server('localhost', 27017, {auto_reconnect: true});
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('winedb', server, {safe: true});
+var server = new Server('paulo.mongohq.com', 10079, {auto_reconnect: true});
+db = new Db('app17725514', server, {safe: true});
 
 db.open(function(err, db) {
     if(!err) {
